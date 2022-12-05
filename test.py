@@ -1,5 +1,7 @@
 my_dictionary_v1 = {
-    "SOFT8023": [["lo1", "lo2", "lo3"], ["prog1", "prog2"], ["assess1", "assess2"]],
+    "SOFT8023": [["lo1", "lo2", "lo3"],
+                 ["prog1", "prog2"],
+                 ["assess1", "assess2"]],
     "SOFT8009": [["lo1", "lo2", "lo3"], ["prog1", "prog2"], ["assess1", "assess2"]]
 }
 
