@@ -1,6 +1,6 @@
 import socket
 
-from datatype import enums
+import enums
 
 LCAX_VALIDATION = ['L', 'C', 'A', 'X']
 AEDR_VALIDATION = ['A', 'E', 'D', 'R']
@@ -11,9 +11,12 @@ AEDR_VALIDATION = ['A', 'E', 'D', 'R']
 def get_module_id():  # get the module id from dictionary
     valid_choice = False  # flag to check if user input is correct
     while not valid_choice:  # loop until user input is correct
-        module_id = input(f"{enums.OTHER_QUESTIONS.ENTER_MOD_ID.value}")  # get user input
+        # get user input
+        module_id = input(f"{enums.OTHER_QUESTIONS.ENTER_MOD_ID.value}")
         if module_id.isdigit():  # check if input is disgit
-            print(f"{enums.OTHER_QUESTIONS.INVALID_INPUT.value} Input must not be an integer")  # display error message
+            # display error message
+            print(
+                f"{enums.OTHER_QUESTIONS.INVALID_INPUT.value} Input must not be an integer")
         else:
             valid_choice = True  # set flag to true and exit the loop
     return str(module_id)  # return the user input
@@ -22,7 +25,8 @@ def get_module_id():  # get the module id from dictionary
 def get_user_choice(correct, **kwargs):  # get choice for all other program functions
     valid_choice = False  # flag to check if user input is correct
     while not valid_choice:  # loop until user input is correct
-        choice = input(str(f"\n{enums.to_string(kwargs['ENUM_'])}? ")).upper()  # get user input
+        # get user input
+        choice = input(str(f"\n{enums.to_string(kwargs['ENUM_'])}? ")).upper()
         if choice in correct:  # check if input is disgit
             valid_choice = True  # set flag to true and exit the loop
         else:
@@ -35,7 +39,9 @@ def get_contents_index(**kwargs):  # get the module id from dictionary
     while not valid_choice:  # loop until user input is correct
         contents_index = input(f"\n{kwargs['ENUM_']}? ")  # get user input
         if not contents_index.isdigit():  # check if input is disgit
-            print(f"{enums.OTHER_QUESTIONS.INVALID_INPUT.value} Input must be an integer")  # display error message
+            # display error message
+            print(
+                f"{enums.OTHER_QUESTIONS.INVALID_INPUT.value} Input must be an integer")
         else:
             valid_choice = True  # set flag to true and exit the loop
     return int(contents_index)  # return the user input
@@ -52,11 +58,14 @@ def send_packet(out_data):  # method to send packet to server
 def from_server_list_item_validation():
     valid_item_id = False  # flag to check if client input is valid
     while not valid_item_id:  # loop until client input is valid
-        out_data = get_contents_index(ENUM_=enums.OTHER_QUESTIONS.ENTER_LO_NUM)  # get requested module id from user
+        # get requested module id from user
+        out_data = get_contents_index(ENUM_=enums.OTHER_QUESTIONS.ENTER_LO_NUM)
         send_packet(str(out_data))  # send module requested module id to server
-        module_exists = on_receive_packet()  # get module id validation message from server
+        # get module id validation message from server
+        module_exists = on_receive_packet()
         print(module_exists)  # print module id validation message from server
-        if module_exists != "ID Item Not Found":  # if the module id validation message says module id requested is found
+        # if the module id validation message says module id requested is found
+        if module_exists != "ID Item Not Found":
             valid_item_id = True  # set flag to true to exit loop
 
 
@@ -65,7 +74,8 @@ PORT = 64001
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create a socket
 client.connect((SERVER, PORT))  # connect socket using localhost and port
-client.sendall(bytes("This is from Client", 'UTF-8'))  # send packet to server to show connection status
+# send packet to server to show connection status
+client.sendall(bytes("This is from Client", 'UTF-8'))
 
 while True:
     in_data = on_receive_packet()  # receive initial packet to see connection status
@@ -77,9 +87,12 @@ while True:
         while not valid_module_id:  # loop until client input is valid
             out_data = get_module_id()  # get requested module id from user
             send_packet(out_data)  # send module requested module id to server
-            module_exists = on_receive_packet()  # get module id validation message from server
-            print(module_exists)  # print module id validation message from server
-            if module_exists != "ID Item Not Found":  # if the module id validation message says module id requested is found
+            # get module id validation message from server
+            module_exists = on_receive_packet()
+            # print module id validation message from server
+            print(module_exists)
+            # if the module id validation message says module id requested is found
+            if module_exists != "ID Item Not Found":
                 valid_module_id = True  # set flag to true to exit loop
 
         module_contents = get_user_choice(LCAX_VALIDATION,
@@ -89,7 +102,8 @@ while True:
         while not end_lo_loop:
             if module_contents == "L":
 
-                contents_items = on_receive_packet()  # get client request response packet from server
+                # get client request response packet from server
+                contents_items = on_receive_packet()
                 print(contents_items)
 
                 crud_contents_actions = get_user_choice(AEDR_VALIDATION,
@@ -101,13 +115,15 @@ while True:
                 if crud_contents_actions == "A":  # if client want to add a new learning outcome
                     new_module_contents_item = input(
                         str(f"{enums.OTHER_QUESTIONS.NEW_LO_DESC}"))  # enter a new module content subitem
-                    send_packet(new_module_contents_item)  # send it to server as a packet
+                    # send it to server as a packet
+                    send_packet(new_module_contents_item)
                 if crud_contents_actions == "E":  # if client want to add a new learning outcome
 
                     from_server_list_item_validation()
                     edited_module_contents_index = contents_index = input(
                         f"\n{enums.OTHER_QUESTIONS.ENTER_NEW_TEXT}? ")  # get user input
-                    send_packet(edited_module_contents_index)  # send it to server as a packet
+                    # send it to server as a packet
+                    send_packet(edited_module_contents_index)
 
                 if crud_contents_actions == "D":
                     from_server_list_item_validation()
@@ -117,14 +133,17 @@ while True:
                     end_lo_loop = True
 
         if module_contents == "C":
-            contents_items = on_receive_packet()  # get client request response packet from server
+            # get client request response packet from server
+            contents_items = on_receive_packet()
             print(contents_items)
         if module_contents == "A":
-            contents_items = on_receive_packet()  # get client request response packet from server
+            # get client request response packet from server
+            contents_items = on_receive_packet()
             print(contents_items)
         if module_contents == "X":
-            contents_items = on_receive_packet()  # get client request response packet from server
+            # get client request response packet from server
+            contents_items = on_receive_packet()
             print(contents_items)
             eXit_loop = True
 
-client.close()
+    client.close()

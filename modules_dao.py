@@ -36,7 +36,7 @@ class StudentModulesDao:
                 ],
                 "assessments": [
                     "Project (An example assessment would be to create a simple client server application using "
-                    "sockets) 20.0% Week 6",
+                    "my_sockets) 20.0% Week 6",
                     "Project (Programming assignment(s) using the technologies covered in the lectures. Example "
                     "assignment(s) will access if a student can apply design patterns to write distributed code, "
                     "use technologies such as RMI and secure communication and information in transit.) 30.0% Week "
@@ -116,6 +116,6 @@ class StudentModulesDao:
     def to_string_list(self, **kwargs):
         list = self.get_listname(module_id=kwargs['module_id'], listname=kwargs['listname'])
         list_string = ""
-        for count, ele in enumerate(list, 1):
+        for count, ele in enumerate(list):
             list_string += f"{count}. {ele}\n"
         return list_string
