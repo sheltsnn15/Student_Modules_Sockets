@@ -1,29 +1,15 @@
 import random
 import threading
 
-from datatype import enums
+import enums
 
 
 # import time
 
 
 class StudentModulesDao:
-    __instance = None
-
-    @staticmethod
-    def get_instance():
-        if StudentModulesDao.__instance is None:
-            with threading.Lock():
-                if StudentModulesDao.__instance is None:  # Double locking mechanism
-                    StudentModulesDao()
-        return StudentModulesDao.__instance
-
     def __init__(self):
-        if StudentModulesDao.__instance is not None:
-            raise Exception("This is a singleton!")
-        else:
-            StudentModulesDao.__instance = self
-        self.db = {
+        self.db = self.db = {
             "SOFT8023": {
                 "learning_outcomes": [
                     "Evaluate and apply design patterns in the design and development of a distributed system.",

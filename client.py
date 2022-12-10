@@ -7,6 +7,12 @@ AEDR_VALIDATION = ['A', 'E', 'D', 'R']
 
 
 # client class
+# run a rabbitmq docker container
+# docker run --rm -it --hostname my-rabbit -p 15672:15672 -p 5672:5672 rabbitmq:3-management
+# build the docker image specified in the dockerfile
+# docker build -t my_custom_socket_server .
+# run the dockerfile to run a custom python socket server application
+# docker run -p 60000:60000 my_custom_socket_server
 
 def get_module_id():  # get the module id from dictionary
     valid_choice = False  # flag to check if user input is correct
@@ -69,8 +75,8 @@ def from_server_list_item_validation():
             valid_item_id = True  # set flag to true to exit loop
 
 
-SERVER = "127.0.0.1"
-PORT = 64001
+SERVER = '127.0.0.1'  # 'localhost'
+PORT = 60000
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create a socket
 client.connect((SERVER, PORT))  # connect socket using localhost and port
@@ -99,8 +105,8 @@ while True:
                                           ENUM_=enums.VIEWS)  # get request from client to view the module id contents [(L)earning Outcomes, (C)ourses, (A)ssessments] or e(X)it the program
         send_packet(module_contents)  # send client request packet
         end_lo_loop = False
-        while not end_lo_loop:
-            if module_contents == "L":
+        if module_contents == "L":
+            while not end_lo_loop:
 
                 # get client request response packet from server
                 contents_items = on_receive_packet()

@@ -12,7 +12,10 @@ class ClientThread(threading.Thread):
         threading.Thread.__init__(self)
         self.c_socket = client_socket
         self.modules = modules_dao.StudentModulesDao()
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+        # self.connection = pika.BlockingConnection(
+        #    pika.ConnectionParameters(host='172.17.0.1'))
+        self.connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host='localhost'))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue='letter_box')
 
@@ -41,9 +44,9 @@ class ClientThread(threading.Thread):
         while True:
             msg = self.on_receive_packet()  # receive initial packet to see connection status
             print("Initial Data from client: ", msg)
+            self.add_to_queue(msg)
             self.send_packet(
                 msg)  # send initial status packet back to client to see connection status
-            self.add_to_queue(msg)
             eXit_loop = False
             while not eXit_loop:
                 received_module_id = None
@@ -63,12 +66,11 @@ class ClientThread(threading.Thread):
 
                 # send success status back to client
                 self.send_packet(module_id)
-
                 module_contents = self.on_receive_packet()
-
+                self.add_to_queue(module_id)
                 end_lo_loop = False
-                while not end_lo_loop:
-                    if module_contents == "L":  # if the user wants to access learning outcomes section
+                if module_contents == "L":
+                    while not end_lo_loop:  # if the user wants to access learning outcomes section
 
                         process_list_name = "learning_outcomes"
 
@@ -83,6 +85,7 @@ class ClientThread(threading.Thread):
                         if crud_contents_actions == "A":  # if the user wants to add a new subitem to learning outcomes section
                             # get the new subitem information the user wants to enter
                             new_module_contents_item = self.on_receive_packet()
+                            self.add_to_queue(new_module_contents_item)
                             result = self.modules.add_lo_element(module_id=received_module_id,
                                                                  info=new_module_contents_item)  # attempt entering that information
                             # send the result of the attempt to client as a packet
@@ -90,6 +93,7 @@ class ClientThread(threading.Thread):
                         if crud_contents_actions == "E":  # if the user wants to edit existing subitem in learning outcomes section
                             # get the index of the subitem information the user wants to edit
                             edit_module_contents_item = self.on_receive_packet()
+                            self.add_to_queue(edit_module_contents_item)
 
                             subitem_index = None
                             valid_subitem_index = False
@@ -111,6 +115,7 @@ class ClientThread(threading.Thread):
 
                             # receive module contents subitem index packet sent from client
                             subitem_index_new_data = self.on_receive_packet()
+                            self.add_to_queue(subitem_index_new_data)
 
                             result = self.modules.edit_lo_element(module_id=received_module_id,
                                                                   listname=process_list_name,
@@ -122,6 +127,7 @@ class ClientThread(threading.Thread):
                         if crud_contents_actions == "D":
                             # get the index of the subitem information the user wants to edit
                             edit_module_contents_item = self.on_receive_packet()
+                            self.add_to_queue(edit_module_contents_item)
 
                             subitem_index = None
                             valid_subitem_index = False
@@ -149,7 +155,7 @@ class ClientThread(threading.Thread):
 
                         if crud_contents_actions == "R":
                             end_lo_loop = True
-
+                            
                 if module_contents == "C":
                     process_list_name = "courses"
                     contents_items = self.modules.to_string_list(module_id=received_module_id,
@@ -167,12 +173,12 @@ class ClientThread(threading.Thread):
             print("Client at ", clientAddress, " disconnected...")
 
 
-LOCALHOST = "127.0.0.1"
-PORT = 64001
+HOSTADDR = "0.0.0.0"
+PORT = 60000
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-server.bind((LOCALHOST, PORT))
+server.bind((HOSTADDR, PORT))
 
 print("Server started")
 print("Waiting for client request..")
