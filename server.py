@@ -12,10 +12,9 @@ class ClientThread(threading.Thread):
         threading.Thread.__init__(self)
         self.c_socket = client_socket
         self.modules = modules_dao.StudentModulesDao()
-        # self.connection = pika.BlockingConnection(
-        #    pika.ConnectionParameters(host='172.17.0.1'))
         self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host='localhost'))
+            #    pika.ConnectionParameters(host='localhost'))
+            pika.ConnectionParameters(host='172.17.0.1'))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue='letter_box')
 
@@ -155,7 +154,7 @@ class ClientThread(threading.Thread):
 
                         if crud_contents_actions == "R":
                             end_lo_loop = True
-                            
+
                 if module_contents == "C":
                     process_list_name = "courses"
                     contents_items = self.modules.to_string_list(module_id=received_module_id,
